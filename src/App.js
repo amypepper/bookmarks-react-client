@@ -1,61 +1,77 @@
-import React, { Component } from 'react';
-import './App.css';
+import React, { Component } from "react";
+import "./App.css";
 
-import AddBookmark from './addBookmark/addBookmark';
-import BookmarkApp from './bookmarkApp/bookmarkApp';
+import AddBookmark from "./addBookmark/addBookmark";
+import BookmarkApp from "./bookmarkApp/bookmarkApp";
 
 class App extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
       bookmarks: [],
-      showAddForm: false
+      showAddForm: false,
     };
+  }
+
+  addBookmark(bookmark) {
+    this.setState({
+      bookmarks: [...this.state.bookmarks, bookmark],
+      showAddForm: false,
+    });
+  }
+
+  setShowAddForm(show) {
+    this.setState({
+      showAddForm: show,
+    });
   }
 
   componentDidMount() {
-    const url = 'http://localhost:8081/v3/bookmarks';
+    const url = "https://tf-ed-bookmarks-api.herokuapp.com/v3/bookmarks";
     const options = {
-      method: 'GET',
+      method: "GET",
       headers: {
-        "Authorization": "Bearer $2a$10$ZhdeJefcb.5sx/DCmO/n8u5sJLcARAdbHw9tfm1mevGRq3s1.5DpW",
-        "Content-Type": "application/json"
-      }
+        Authorization:
+          "Bearer $2a$10$92n4HriYAG/LyJeIF5gIVeHIXCT3dt0FdOPi7Btyn/bqkqkAx1wlW",
+        "Content-Type": "application/json",
+      },
     };
 
     fetch(url, options)
-      .then(res => {
-        if(!res.ok) {
-          throw new Error('Something went wrong, please try again later.');
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Something went wrong, please try again later.");
         }
         return res;
       })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         this.setState({
           bookmarks: data,
-          error: null
+          error: null,
         });
       })
-      .catch(err => {
+      .catch((err) => {
         this.setState({
-          error: err.message
+          error: err.message,
         });
       });
-
   }
 
   render() {
-    const page = this.state.showAddForm
-          ? <AddBookmark />
-          : <BookmarkApp bookmarks={this.state.bookmarks}/>; 
-
-    return (
-      <div className="App">
-        { page }
-      </div>
+    const page = this.state.showAddForm ? (
+      <AddBookmark
+        showForm={(show) => this.setShowAddForm(show)}
+        handleAdd={(bookmark) => this.addBookmark(bookmark)}
+      />
+    ) : (
+      <BookmarkApp
+        bookmarks={this.state.bookmarks}
+        showAddForm={(show) => this.setShowAddForm(show)}
+      />
     );
+
+    return <div className="App">{page}</div>;
   }
 }
 
